@@ -22,3 +22,22 @@ A full-stack expense tracking web application built using **Django** with integr
 
 ## Project Structure
 
+## Running the Project (IMPORTANT)
+
+This project uses TWO servers:
+
+1. Django → Main application
+2. Flask → Analytics microservice
+
+### Steps
+
+1. Clone repository
+2. Create & activate virtual environment
+3. Install dependencies
+4. Run Django server
+5. Run Flask analytics server (separately)
+
+### Django
+```bash
+python manage.py migrate
+python manage.py runserver
