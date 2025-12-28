@@ -1,0 +1,98 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Account Settings</title>
+    <link rel="stylesheet" href="{% static 'expenses/style.css' %}">
+</head>
+<body>
+
+{% include 'expenses/partials/topbar.html' %}
+
+<div class="summary-wrapper">
+
+    <!-- HEADER -->
+    <div class="summary-header">
+        <h2 class="summary-heading">
+            Account Settings
+            <span class="heading-underline"></span>
+        </h2>
+        <p class="summary-subtitle">
+            Manage your profile, security, and data
+        </p>
+    </div>
+
+    <a href="{% url 'home' %}" class="back-btn">
+        ← Back to Home
+    </a>
+
+    <!-- ACCOUNT INFO -->
+    <div class="card settings-card">
+        <h3 class="settings-title">Account Information</h3>
+
+        <div class="settings-row">
+            <span>Username</span>
+            <strong>{{ request.user.username }}</strong>
+        </div>
+
+        <div class="settings-row">
+            <span>Joined</span>
+            <strong>{{ request.user.date_joined|date:"F d, Y" }}</strong>
+        </div>
+
+        <div class="settings-row">
+            <span>Last Login</span>
+            <strong>{{ request.user.last_login|date:"F d, Y • H:i" }}</strong>
+        </div>
+    </div>
+
+    <!-- SECURITY -->
+    <div class="card settings-card">
+        <h3 class="settings-title">Security</h3>
+
+        <p class="settings-desc">
+            Keep your account secure by updating your password regularly.
+        </p>
+
+        <a href="{% url 'password_change' %}" class="primary-btn">
+            Change Password
+        </a>
+    </div>
+
+    <!-- DATA -->
+    <div class="card settings-card">
+        <h3 class="settings-title">Your Data</h3>
+
+        <p class="settings-desc">
+            Download a copy of all your recorded expenses.
+        </p>
+
+        <a href="{% url 'export_expenses_csv' %}" class="outline-btn">
+    Export Expenses (CSV)
+</a>
+
+    </div>
+
+    <!-- DANGER ZONE -->
+    <div class="card danger-card">
+        <h3 class="danger-title">Danger Zone</h3>
+
+        <p class="danger-text">
+            Deleting your account is permanent and cannot be undone.
+            All your expenses will be erased.
+        </p>
+
+        <form method="post" action="{% url 'delete_account' %}">
+            {% csrf_token %}
+            <button type="submit" class="danger-btn">
+                Delete Account
+            </button>
+        </form>
+    </div>
+
+</div>
+
+
+
+</body>
+</html>

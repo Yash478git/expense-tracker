@@ -1,0 +1,223 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Expense Summary</title>
+    <link rel="stylesheet" href="{% static 'expenses/style.css' %}?v=3">
+
+</head>
+<body>
+
+<!-- HEADER (reuse same top bar) -->
+{% include 'expenses/partials/topbar.html' %}
+
+<div class="summary-wrapper">
+
+    <!-- PAGE TITLE -->
+    <div class="summary-header">
+    <h2 class="summary-heading">
+        Expense Summary
+        <span class="heading-underline"></span>
+    </h2>
+
+   <p class="summary-subtitle">
+    {% if selected_month %}
+        Overview for {{ selected_month|date:"F Y" }}
+    {% else %}
+        Overview for {% now "F Y" %}
+    {% endif %}
+</p>
+
+</div>
+
+
+    <a href="{% url 'home' %}" class="back-btn">
+    ← Back to Dashboard
+</a>
+
+
+    <!-- KPI CARDS -->
+    <form method="get" class="month-filter">
+    <label>Filter by month</label>
+    <input type="month" name="month" value="{{ request.GET.month }}">
+    <button type="submit">Apply</button>
+</form>
+
+
+
+
+<div class="kpi-grid">
+
+    <!-- This Month (money, animated) -->
+    <div class="kpi-card">
+        <span class="kpi-label">This Month</span>
+        <span class="kpi-value currency" data-target="{{ monthly_total }}">₹0</span>
+
+    </div>
+
+    <!-- Categories (count, animated, NO ₹) -->
+    <div class="kpi-card">
+        <span class="kpi-label">Categories</span>
+        <span class="kpi-value" data-target="{{ category_count }}">0</span>
+    </div>
+
+    <!-- Top Category (TEXT, NOT animated, NO ₹ prefix) -->
+    <div class="kpi-card">
+        <span class="kpi-label">Top Category</span>
+
+        {% if top_category %}
+            <span class="kpi-value text">
+                {{ top_category.category }}
+                <small>₹ {{ top_category.total }}</small>
+            </span>
+        {% else %}
+            <span class="kpi-value text">—</span>
+        {% endif %}
+    </div>
+
+</div>
+
+
+
+
+
+    </div>
+
+    <!-- CHART + TABLE -->
+    <div class="summary-content">
+
+        <!-- CHART -->
+        <div class="chart-card">
+            <h3>Spending Distribution</h3>
+            <canvas id="expenseChart"></canvas>
+
+
+        </div>
+
+        <!-- TABLE -->
+        <div class="table-card">
+            <h3>Category-wise Breakdown</h3>
+
+            <table class="summary-table">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in category_summary %}
+                    <tr>
+                        <td>
+                            <span class="badge">{{ item.category }}</span>
+                        </td>
+                        <td>₹ {{ item.total }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<script>
+const ctx = document.getElementById('expenseChart');
+
+new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: [
+            {% for item in category_summary %}
+                "{{ item.category }}",
+            {% endfor %}
+        ],
+        datasets: [{
+            data: [
+                {% for item in category_summary %}
+                    {{ item.total }},
+                {% endfor %}
+            ],
+            backgroundColor: [
+                '#7C6AFF',
+                '#4ADE80',
+                '#FACC15',
+                '#F87171',
+                '#38BDF8'
+            ],
+            borderColor: '#ffffff',
+            borderWidth: 2,
+            hoverOffset: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        radius: '75%',   // 🔑 matches your screenshot
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    boxWidth: 12,
+                    padding: 16,
+                    font: {
+                        size: 12,
+                        weight: '500'
+                    }
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(ctx) {
+                        return `${ctx.label}: ₹ ${ctx.parsed.toLocaleString()}`;
+                    }
+                }
+            }
+        }
+    }
+});
+</script>
+
+
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".kpi-value[data-target]").forEach(el => {
+
+        const target = Number(el.dataset.target);
+        if (isNaN(target)) return;
+
+        const isCurrency = el.classList.contains("currency");
+        let current = 0;
+        const step = Math.max(1, target / 60);
+
+        const animate = () => {
+            current += step;
+
+            if (current < target) {
+                el.textContent = isCurrency
+                    ? `₹ ${Math.floor(current)}`
+                    : Math.floor(current);
+                requestAnimationFrame(animate);
+            } else {
+                el.textContent = isCurrency
+                    ? `₹ ${target}`
+                    : target;
+            }
+        };
+
+        animate();
+    });
+});
+</script>
+
+
+
+</body>
+</html>

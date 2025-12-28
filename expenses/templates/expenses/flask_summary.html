@@ -1,0 +1,127 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flask Analytics</title>
+    <link rel="stylesheet" href="{% static 'expenses/style.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+{% include 'expenses/partials/topbar.html' %}
+
+<div class="summary-container">
+
+<div class="summary-wrapper">
+
+    <div class="flask-header">
+    <h1 class="flask-title">
+        Flask Analytics
+        <span class="flask-underline"></span>
+    </h1>
+    <p class="flask-subtitle">
+        Monthly insights and category-level expense breakdown
+    </p>
+</div>
+
+
+    <!-- KPI -->
+    <div class="flask-kpi-wrapper">
+    <div class="flask-kpi-card">
+        <span class="flask-kpi-label">Monthly Total</span>
+        <span class="flask-kpi-value">₹ {{ monthly_total|floatformat:0 }}</span>
+        <span class="flask-kpi-subtext">All expenses combined</span>
+    </div>
+</div>
+
+
+    <!-- CHART + TABLE -->
+    <div class="summary-content">
+
+        <!-- CHART -->
+        <div class="chart-card flask-chart-card">
+            <h3>Expense Chart</h3>
+            <canvas id="expenseChart"></canvas>
+        </div>
+
+        <!-- TABLE -->
+        <div class="table-card">
+            <h3>Category-wise Expenses</h3>
+
+            <table class="summary-table">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Total Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in categories %}
+                    <tr>
+                        <td><span class="badge">{{ item.category }}</span></td>
+                        <td>₹ {{ item.total }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <a href="{% url 'home' %}" class="back-btn">← Back to Home</a>
+
+</div>
+
+
+</div>
+
+<script>
+const ctx = document.getElementById('expenseChart');
+
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: [
+            {% for item in categories %}
+                "{{ item.category }}",
+            {% endfor %}
+        ],
+        datasets: [{
+            label: 'Expenses (₹)',
+            data: [
+                {% for item in categories %}
+                    {{ item.total }},
+                {% endfor %}
+            ],
+            backgroundColor: '#7c7cff',
+            borderRadius: 10,
+            maxBarThickness: 60
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: value => `₹ ${value}`
+                }
+            }
+        },
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    label: ctx => `₹ ${ctx.parsed.y.toLocaleString()}`
+                }
+            }
+        }
+    }
+});
+</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delete Account</title>
+    <link rel="stylesheet" href="{% static 'expenses/style.css' %}">
+</head>
+<body class="auth-body">
+
+<div class="auth-container">
+    <div class="auth-card">
+
+        <h2 class="auth-title">Delete Account</h2>
+        <p class="auth-subtitle" style="color:#e63946;">
+            This action is permanent and cannot be undone.
+        </p>
+
+        {% if messages %}
+            {% for message in messages %}
+                <p class="error-msg">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <input type="password" name="password" required placeholder=" ">
+                <label>Confirm Password</label>
+            </div>
+
+            <button type="submit" class="auth-btn" style="background:#e63946;">
+                Delete My Account
+            </button>
+        </form>
+
+        <p style="margin-top:16px;">
+            <a href="{% url 'home' %}">Cancel & go back</a>
+        </p>
+
+    </div>
+</div>
+
+</body>
+</html>

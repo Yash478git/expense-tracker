@@ -1,0 +1,39 @@
+<div class="top-bar">
+
+    <!-- USER -->
+    <a href="{% url 'account_settings' %}" class="user-badge-link">
+    <div class="user-badge">
+        <div class="avatar">
+            {{ request.user.username|first|upper }}
+        </div>
+        <div class="user-info">
+            <span class="label">Logged in as</span>
+            <span class="username">{{ request.user.username }}</span>
+        </div>
+    </div>
+</a>
+
+
+    <!-- CENTER TITLE + NAV -->
+    <div class="center-header">
+        <h1 class="app-title">Expense Tracker</h1>
+
+        <div class="dashboard-nav">
+            <a href="{% url 'summary' %}" class="nav-pill active">
+                Expense Summary
+            </a>
+            <a href="{% url 'flask_summary' %}" class="nav-pill outline">
+                Flask Analytics
+            </a>
+        </div>
+    </div>
+
+    <!-- LOGOUT -->
+    <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="logout-btn">Logout</button>
+
+    </form>
+
+
+</div>
