@@ -41,3 +41,7 @@ This project uses TWO servers:
 ```bash
 python manage.py migrate
 python manage.py runserver
+
+### Flask
+cd flask_app
+python app.py
